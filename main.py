@@ -20,12 +20,11 @@ async def send_message(message: Message, user_message: str) -> None:
         return
     if is_private := user_message[0] == '?':
         user_message = user_message[1:]
+    if message.author == client.user:
+        return
 
 @client.event
 async def on_message(message: Message) -> None:
-    if message.author == client.user:
-        return
-    warn_user(message)
     username = str(message.author)
     user_message = message.content
     channel = str(message.channel)
