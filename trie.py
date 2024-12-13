@@ -1,4 +1,4 @@
-#TODO write about this data structure inside the NEA document degsin and analysiszz
+#TODO write about this data structure inside the NEA document degsin and analysis
 
 class trie_node:
     def __init__(self):
