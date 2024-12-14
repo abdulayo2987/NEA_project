@@ -1,18 +1,17 @@
-from trie import trie
+from discord import app_commands, Client, Intents
 import discord
-from discord import app_commands
-from run import Client, Intents
-from discord.ext import commands
 
 intents = Intents.default()
-tree = app_commands.CommandTree(Client)
-Banned_list = trie()
+intents.message_content = True
+client = Client(intents=intents)
+tree = app_commands.CommandTree(client)
+
 
 def moderation_commands():
 
-    @tree.command(name = "ban_word")
-    @app_commands.describe(banned_word_add = "what word do you want me to ban?")
-    async def add_to_banned_words(interaction: discord.Interaction, banned_word_add: str):
+    @tree.command(name="ban_word")
+    @app_commands.describe(banned_word_add="What word do you want to ban?")
+    async def ban_word(interaction: discord.Interaction, banned_word_add: str):
         await interaction.response.send_message(f'"{banned_word_add}" has been banned.')
 
     def delete_from_banned_words(message):
