@@ -8,7 +8,6 @@ from moderation import moderation_commands, client, tree
 load_dotenv()
 TOKEN = str(os.getenv('DISCORD_TOKEN'))
 
-# Register commands from temp
 moderation_commands()
 
 # Event listeners
@@ -20,6 +19,7 @@ async def on_ready():
         print(f'Commands synced successfully: {len(synced)} command(s)')
     except discord.Forbidden as e:
         print(f"Failed to sync commands: {e}")
+    print([command.name for command in synced])
 
 
 # Main function

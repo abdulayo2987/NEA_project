@@ -1,4 +1,4 @@
-#TODO write about this data structure inside the NEA document degsin and analysis
+#TODO write about this data structure inside the NEA document design and analysis
 
 class trie_node:
     def __init__(self):
@@ -13,7 +13,7 @@ class trie:
         current_node = self.root
         
         for character in word:
-            if character in current_node.children:              #if the character is not in the children nodes
+            if character not in current_node.children:              #if the character is not in the children nodes
                 current_node.children[character] = trie_node()  #add the character as a key and set make it point to a new node
             current_node = current_node.children[character]     #set this node as the current node regardless of if it is a new character or not 
         current_node.is_end_of_word = True
@@ -24,18 +24,37 @@ class trie:
         for character in word:
             if character not in current_node.children:
                 return False
-            current_node = current_node[character]
+            current_node = current_node.children[character]
         return current_node.is_end_of_word
 
     def delete_helper_function(self, current_node, word:str, index):
-        pass
+        if index == len(word):
+            if not current_node.is_end_of_word:
+                return False
+            current_node.is_end_of_word = False
+            return len(current_node.children) == 0
+        character = word[index]
+        node = current_node.children.get(character)
+
+        if node is None:
+            return False
+        delete_current_node = self.delete_helper_function(node, word, index + 1)
+        if delete_current_node:
+            del current_node.children[character]
+        return len(current_node.children) == 0 and not current_node.is_end_of_word
+
 
     def delete(self, word:str):
         self.delete_helper_function(self.root, word, 0)
 
-        #https://youtu.be/y3qN18t-AhQ?t=850
-
-    
-
     def list_words(self):
-        pass
+        words = []
+        def traverse(current_node, word):
+            if current_node.is_end_of_word:
+                words.append("".join(word))
+            for character, child in current_node.children.items():
+                traverse(child, word + [character])
+
+        traverse(self.root, [])
+        return (f"The following words are banned: {words}")
+
