@@ -10,7 +10,7 @@ TOKEN = str(os.getenv('DISCORD_TOKEN'))
 
 moderation_commands()
 
-# Event listeners
+# Event listener
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user}')
@@ -19,7 +19,15 @@ async def on_ready():
         print(f'Commands synced successfully: {len(synced)} command(s)')
     except discord.Forbidden as e:
         print(f"Failed to sync commands: {e}")
-    print([command.name for command in synced])
+
+@client.event
+async def on_message(message: Message):
+    words = message.content.split()
+    for word in words:
+        bad = banned_words.search(word)
+        if bad == True
+            
+
 
 
 # Main function
