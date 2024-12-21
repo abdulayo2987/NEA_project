@@ -20,3 +20,5 @@ async def on_message(message: Message) -> None:
     channel = str(message.channel)
     print(f'[{channel}] {username}: "{user_message}"')
     await send_message(message, user_message)
+
+
