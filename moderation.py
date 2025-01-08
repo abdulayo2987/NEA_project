@@ -1,3 +1,5 @@
+import math
+
 from discord import app_commands, Client, Intents, Message
 import discord
 from trie import trie
@@ -16,11 +18,10 @@ punishments_list = {
     3 : "kick",
     4 : "ban"
 }
+
 banned_words_punishments = {
     "porn" : "warn",
 }
-
-
 
 def moderation_commands():
 
@@ -49,11 +50,6 @@ def moderation_commands():
         else:
             await interaction.response.send_message(f'"{check_word}" is not banned.')
 
-    @bot.command()
-    @app_commands.describe(fruits='fruits to choose from')
-    async def fruit(interaction: discord.Interaction, fruits: Literal['apple', 'banana', 'cherry']):
-        await interaction.response.send_message(f'Your favourite fruit is {fruits}.')
-
 def check_message():
     @client.event
     async def on_message(message: Message):
@@ -74,7 +70,7 @@ def moderator_action(message: Message, punishment: str):
     elif punishment == "kick":
         punishment_level = 3
 
-    file = "NEA_project.db"
+    file = "NEA.sqlite"
     connection = sqlite3.connect(file)
     cursor = connection.cursor()
 
@@ -84,7 +80,7 @@ def moderator_action(message: Message, punishment: str):
         WHERE user_id = {message.author.id} AND guild_id = {message.guild.id}
         """)
     result = cursor.fetchone()
-    if result == 2:
+    if math.fmod(result, 2) == 0 and result != 0:
         punishment = banned_words_punishments[punishment_level+1]
 
 
