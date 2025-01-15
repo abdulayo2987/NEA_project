@@ -22,3 +22,48 @@ async def on_message(message: Message) -> None:
     await send_message(message, user_message)
 
 
+    embed = discord.Embed(
+        title="🔔 Add your roles!",
+        description="Thank you for joining us! Enjoy your stay.",
+        color=discord.Color.blue()  # Choose any color
+    )
+
+    embed.add_field(name="Select the roles that you would", value="🟢-Towny\n"
+                                                                  "🟢-Survival\n"
+                                                                  "🔵-Sneak Peaks\n"
+                                                                  "🟣-Server Status\n"
+                                                                  "🟡-Events\n"
+                                                                  "🔴-Polls\n", inline=False)
+
+    # Send the embed in the current channel
+    await message.channel.send(embed=embed)
+
+    embed = discord.Embed(
+        title="Custom Banner",
+        description="This is a message with a custom banner!",
+        color=discord.Color.blue()
+    )
+    embed.set_image(
+        url="https://rukminim2.flixcart.com/image/416/416/kpcy5jk0/poster/h/c/w/large-village-poster-scenery-scenrym-68-original-imag3m8vrkdztzva.jpeg?q=70&crop=false")
+    await channel.send(embed=embed)
+
+    embed = discord.Embed(
+        title="🔔 Add your roles!",
+        description="Thank you for joining us! Enjoy your stay.",
+        color=discord.Color.blue()  # Choose any color
+    )
+    embed.add_field(name="Select the roles that you would", value="🟠-Towny\n"
+                                                                  "🟢-Survival\n"
+                                                                  "🔵-Sneak Peaks\n"
+                                                                  "🟣-Server Status\n"
+                                                                  "🟡-Events\n"
+                                                                  "🔴-Polls\n", inline=False)
+    message = await channel.send(embed=embed)
+    await message.add_reaction("🟠")
+    await message.add_reaction("🟢")
+    await message.add_reaction("🔵")
+    await message.add_reaction("🟣")
+    await message.add_reaction("🟡")
+    await message.add_reaction("🔴")
+
+

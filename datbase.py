@@ -1,10 +1,9 @@
 import sqlite3
-import os
-from pathlib import Path
 from moderation import client
 
+file = "nea.sqlite"
+
 def fill_users():
-    file = "identifier.sqlite"
     connection = sqlite3.connect(file)
     cursor = connection.cursor()
     members = list(client.get_all_members())
@@ -26,7 +25,6 @@ def fill_users():
     connection.close()
 
 def fill_moderation():
-    file = "identifier.sqlite"
     connection = sqlite3.connect(file)
     cursor = connection.cursor()
     members = list(client.get_all_members())
@@ -45,32 +43,29 @@ def fill_moderation():
             SET top_role_id = ?, guild_id = ?
             WHERE user_id = ?
             """, (member.top_role.id, member.guild.id, member.id))
-            print("code ran successfully")
     connection.commit()
     connection.close()
-    print("code ran successfully")
 
-def fill_guilds(Guild):
-    file = "identifier.sqlite"
+def fill_guilds(guild):
     connection = sqlite3.connect(file)
     cursor = connection.cursor()
-    guild = Guild
-    cursor.execute("""
-    INSERT INTO guilds (guild_id, guild_name, owner_id, creation_date) VALUES (?, ?, ?, ?)
-    """, (guild.id, guild.name, guild.owner.id, guild.created_at))
+    cursor.execute("SELECT COUNT(*) FROM guilds WHERE guild_id = ?", (guild.id,))
+    exists = cursor.fetchone()[0]
+    if not exists:
+        cursor.execute("""
+        INSERT INTO guilds (guild_id, guild_name, owner_id, creation_date) VALUES (?, ?, ?, ?)
+        """, (guild.id, guild.name, guild.owner.global_name, guild.created_at.date()))
+        print("code ran")
+    else:
+        cursor.execute("""
+        UPDATE guilds
+        SET guild_name = ?, owner_id = ?, creation_date = ?
+        WHERE guild_id = ?
+        """, (guild.name, guild.owner.id, guild.created_at.date(), guild.id))
+        print("code ran")
+    connection.commit()
+    connection.close()
 
 def fill_roles():
-    file = "identifier.sqlite"
     connection = sqlite3.connect(file)
     cursor = connection.cursor()
-
-def fill_database(Guild):
-    if os.path.exists("has_run.txt"):
-        print("database filled")
-    else:
-        file_path = Path("has_run.txt")
-        with open(file_path, 'w') as file:
-            file.write("database filled")
-        fill_users()
-        fill_moderation()
-        fill_guilds(Guild)

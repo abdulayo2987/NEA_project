@@ -74,7 +74,7 @@ async def moderator_action(message: Message, punishment: str, bad_word: str):
     else:
         punishment_level = 4
 
-    file = "identifier.sqlite"
+    file = "nea.sqlite"
     connection = sqlite3.connect(file)
     cursor = connection.cursor()
 
