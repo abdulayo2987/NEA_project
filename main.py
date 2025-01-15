@@ -3,8 +3,10 @@ import os
 import discord
 from discord import Message
 from dotenv import load_dotenv
-from datbase import fill_database, fill_moderation
+from datbase import fill_moderation, fill_guilds, fill_users
 from moderation import moderation_commands, check_message, client, bot
+from welcome import new_welcome_channel
+from roles import new_roles_channel
 #fix no module named 'audioop' by deleting import from python file
 
 # Load environment variables
@@ -23,32 +25,29 @@ async def on_ready():
     except discord.Forbidden as e:
         print(f"Failed to sync commands: {e}")
 
-async def send_message(message: Message, user_message: str) -> None:
-    if not user_message:
-        print('message empty')
-        return
-    if message.author == client.user:
-        return
-    if is_private := user_message[0] == '?':
-        user_message = user_message[1:]
-    try:
-        response = "hello"
-        await message.author.send(response) if is_private else await message.channel.send(response)
-    except Exception as e:
-        print(e)
-
 
 @client.event
-async def on_message(message: Message) -> None:
-    username = str(message.author)
-    user_message = message.content
-    channel = str(message.channel)
-    print(f'[{channel}] {username}: "{user_message}"')
-    fill_moderation()
+async def on_first_message(message: Message) -> None:
+    guild = message.guild
+    if os.path.exists(f'{guild}.txt'):
+        print("first message sent")
+    else:
+        file_path = f'{guild}.txt'
+        new_roles_channel(guild)
+        new_welcome_channel()
+        with open(file_path, 'w') as file:
+            file.write("welcome and role channel created \n")
+        fill_moderation()
+        fill_users()
+        fill_guilds(guild)
+        with open(file_path, 'w') as file:
+            file.write("database filled\n")
+    
+    
     print("done")
     if message.author == client.user:
         return
-    await message.channel.send("fdggd")
+    await message.channel.send("hello")
 
 
 

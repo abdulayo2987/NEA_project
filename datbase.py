@@ -63,14 +63,3 @@ def fill_roles():
     file = "identifier.sqlite"
     connection = sqlite3.connect(file)
     cursor = connection.cursor()
-
-def fill_database(Guild):
-    if os.path.exists("has_run.txt"):
-        print("database filled")
-    else:
-        file_path = Path("has_run.txt")
-        with open(file_path, 'w') as file:
-            file.write("database filled")
-        fill_users()
-        fill_moderation()
-        fill_guilds(Guild)
