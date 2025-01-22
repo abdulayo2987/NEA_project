@@ -67,3 +67,9 @@ async def on_message(message: Message) -> None:
     await message.add_reaction("🔴")
 
 
+
+    @bot.command(name="delete_role", description="Delete an existing role")
+    @app_commands.describe(role_name="What is the name of the role you want to delete")
+    async def delete_role(interaction: discord.Interaction, role_name: Literal[list[client.get_guild().roles]]):
+        role_name = role_name[0]
+        await interaction.response.send_message("function working")

@@ -1,4 +1,3 @@
-from asyncio import timeout
 from datetime import timedelta
 import discord
 import sqlite3
@@ -34,10 +33,12 @@ def moderation_commands():
         await interaction.response.send_message(f'"{banned_word_add}" has been banned.')
 
     @bot.command(name="unban_word", description="Unban a word from being used in the server.")
-    @app_commands.describe(unbanned_word_add="What word do you want to unban?")
-    async def unban_word(interaction: discord.Interaction, unbanned_word_add: str):
-        banned_words.delete(unbanned_word_add)
-        await interaction.response.send_message(f'"{unbanned_word_add}" has been unbanned.')
+    @app_commands.describe(unbanned_word="What word do you want to unban?")
+    async def unban_word(interaction: discord.Interaction, unbanned_word: str):
+        banned_words.delete(unbanned_word)
+        if unbanned_word in banned_words_punishments:
+            del banned_words_punishments[unbanned_word]
+        await interaction.response.send_message(f'"{unbanned_word}" has been unbanned.')
 
     @bot.command(name="list_banned_words", description="List all banned words in the server.")
     async def list_all_banned_words(interaction: discord.Interaction):
@@ -105,7 +106,7 @@ async def moderator_action(message: Message, punishment: str, bad_word: str):
     if punishment_level == 1:
         await message.channel.send(f"{client.user.mention} you cannot say {bad_word} as it is banned in this server")
     elif punishment_level == 2:
-        await message.channel.send(f"{client.user.mention} you have been muted for 5 mins for saying {bad_word} as it is banned in this server")
+        await message.channel.send(f"{client.user.mention} you have been muted for 5 minutes for saying {bad_word} as it is banned in this server")
         await discord.Member.edit(timeout=discord.utils.utcnow() + timedelta(seconds=600))
     elif punishment_level == 3:
         await discord.Member.kick(reason="using banned words")

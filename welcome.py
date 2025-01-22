@@ -26,6 +26,7 @@ responses = ["Welcome to our server {guild} {username}! Thanks for joining us!",
 async def new_welcome_channel(guild):
     await new_channel(guild, "welcome")
     channel = discord.utils.get(guild.channels, name="welcome")
+    await channel.set_permissions(guild.default_role, send_messages=False)
     await channel.send(f"welcome to {guild.name}")
 
 def new_member_join():

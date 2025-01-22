@@ -11,6 +11,7 @@ load_dotenv()
 TOKEN = str(os.getenv('DISCORD_TOKEN'))
 
 moderation_commands()
+role_commands()
 check_message()
 new_member_join()
 first_message_sent = False
@@ -22,7 +23,6 @@ async def on_ready():
         print(f'Commands synced successfully: {len(synced)} command(s)')
     except discord.Forbidden as e:
         print(f"Failed to sync commands: {e}")
-
 
 @client.event
 async def on_message(message: Message) -> None:
@@ -40,11 +40,10 @@ async def on_message(message: Message) -> None:
             await new_welcome_channel(guild)
             with open(file_path, 'w') as file:
                 file.write("welcome and role channel created \n")
-            fill_moderation()
-            fill_users()
-            fill_guilds(guild)
+            fill_database(guild)
             with open(file_path, 'w') as file:
                 file.write("database filled\n")
+
 
 
 # Main function
