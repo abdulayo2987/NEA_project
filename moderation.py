@@ -7,6 +7,7 @@ from typing import Literal
 
 intents = Intents.default()
 intents.message_content = True
+intents.reactoion = False
 intents.members = True
 client = Client(intents=intents)
 bot = app_commands.CommandTree(client)

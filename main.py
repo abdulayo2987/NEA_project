@@ -14,7 +14,6 @@ moderation_commands()
 role_commands()
 check_message()
 new_member_join()
-first_message_sent = False
 
 @client.event
 async def on_ready():
@@ -28,22 +27,21 @@ async def on_ready():
 async def on_message(message: Message) -> None:
     if message.author == client.user:
         return
-    global first_message_sent
     guild = message.guild
-    if not first_message_sent:
-        first_message_sent = True
-        if os.path.exists(f'{guild}.txt'):
+    file_path = f'{guild}.txt'
+    try:
+        with open(filepath, "r") as file:
+            first_message = file.readline().strip()
+        if first_messasge == "first message has been sent":
             return
-        else:
-            file_path = f'{guild}.txt'
-            await new_roles_channel(guild)
-            await new_welcome_channel(guild)
-            with open(file_path, 'w') as file:
-                file.write("welcome and role channel created \n")
-            fill_database(guild)
-            with open(file_path, 'w') as file:
-                file.write("database filled\n")
-
+    except FileNotFoundError:
+        await new_roles_channel(guild)
+        await new_welcome_channel(guild)
+        with open(file_path, 'w') as file:
+            file.write("welcome and role channel created \n")
+        fill_database(guild)
+        with open(file_path, 'w') as file:
+            file.write("database filled\n")
 
 
 # Main function

@@ -4,14 +4,14 @@ import discord
 from functions import new_channel
 from moderation import *
 
+role_emojis={
+    "member":"😊",
+}
+
 async def new_roles_channel(guild):
     channel = await new_channel(guild, "roles")
     await channel.set_permissions(guild.default_role,send_messages=False)
 
-role_emojis={
-    "member":"😊",
-     "user":"hi"
-}
 
 async def role_autocomplete(interaction: discord.Interaction, current: str):
     roles = interaction.guild.roles
@@ -336,7 +336,41 @@ def role_commands(): #add to objectives
 
     @client.event()
     async def on_reaction_add(reaction: discord.Reaction, user: discord.User):
+        if reaction.message.id == specific_message_id:
+            role_name = next((k for k, role in role_emojis.items() if role == reaction.emoji), None)
+            role = interaction.guild.get_role(int(role_name))
+            try:
+                await user.add_roles(role)
+            except discord.Forbidden:
+                await interaction.response.send_message(f"I do not have permission to add <@&{role.id}>")
+                return
+            connection = sqlite3.connect("nea.sqlite")
+            cursor = connection.cursor()
+            cursor.execute("""
+            UPDATE user_roles
+            SET top_role_id = ?
+            WHERE user_id = ? AND guild_id = ?
+            """, (user.top_role.id, user.id, role.guild.id))
+            connection.commit()
+            connection.close()
 
 
     @client.event()
-    async def on_reaction_add(reaction: discord.Reaction, user: discord.User):
+    async def on_reaction_remove(reaction: discord.Reaction, user: discord.User):
+        if reaction.message.id == specific_message_id:
+            role_name = next((k for k, role in role_emojis.items() if role == reaction.emoji), None)
+            role = interaction.guild.get_role(int(role_name))
+            try:
+                await user.remove_roles(role)
+            except discord.Forbidden:
+                await interaction.response.send_message(f"I do not have permission to add <@&{role.id}>")
+                return
+            connection = sqlite3.connect("nea.sqlite")
+            cursor = connection.cursor()
+            cursor.execute("""
+            UPDATE user_roles
+            SET top_role_id = ?
+            WHERE user_id = ? AND guild_id = ?
+            """, (user.top_role.id, user.id, role.guild.id))
+            connection.commit()
+            connection.close()
