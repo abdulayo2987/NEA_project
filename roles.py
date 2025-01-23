@@ -5,11 +5,13 @@ from functions import new_channel
 from moderation import *
 
 role_emojis={
-    "member":"😊",
+    "member":"😊"  #store in premade text file if enough time 
 }
 
 async def new_roles_channel(guild):
     channel = await new_channel(guild, "roles")
+    global channel_id
+    channel_id = channel.id
     await channel.set_permissions(guild.default_role,send_messages=False)
 
 
@@ -226,7 +228,7 @@ def role_commands(): #add to objectives
             try:
                 await member.add_roles(role_to_add)
             except discord.Forbidden:
-                await interaction.response.send_message(f"I do not have permission to add <@&{role.id}>")
+                await interaction.response.send_message(f"I do not have permission to add <@&{role_to_add.id}>")
                 return
             cursor.execute("""
                         UPDATE user_roles
@@ -321,28 +323,35 @@ def role_commands(): #add to objectives
 
     @bot.command(name="welcome_message", description="sends a welcome message that users can react to to get a role")
     async def welcome_message(interaction: discord.Interaction):
-        role_info = "\n".join([f"{emoji} -{role}" for role, emoji in role_emojis.items()])
-        embed = discord.Embed(colour=discord.Colour.green())
-        embed.description = f"{role_info}"
-        message = await interaction.channel.send(embed=embed)
-        await interaction.response.send_message(f"react to the following message with corresponding emoji for role")
-        for emoji in role_emojis.values():
-            try:
-                await message.add_reaction(emoji)
-            except discord.HTTPException as e: #cannot add reaction
-                if e.code == 10014:
-                    await interaction.response.send_message("one or more of the emojis you have added is not an emoji")
-                return
+        channel = discord.utils.get(interaction.guild.channels, name="posts")
+        if interaction.channel.id != channel.id:
+            await interaction.respone.send_message(f"this command can only be usen in the roles channel")
+        else:
+            role_info = "\n".join([f"{emoji} -{role}" for role, emoji in role_emojis.items()])
+            embed = discord.Embed(colour=discord.Colour.blue())
+            embed.description = f"{role_info}"
+            message = await interaction.channel.send(embed=embed)
+            await interaction.response.send_message(f"react to the following message with corresponding emoji for role")
+            for emoji in role_emojis.values():
+                try:
+                    await message.add_reaction(emoji)
+                    global welcome_message_id
+                    welcome_message_id = message.id
+                    return welcome_message_id
+                except discord.HTTPException as e: #cannot add reaction
+                    if e.code == 10014:
+                        await interaction.response.send_message("one or more of the emojis you have added is not an emoji")
+                    return
 
     @client.event()
     async def on_reaction_add(reaction: discord.Reaction, user: discord.User):
-        if reaction.message.id == specific_message_id:
+        if reaction.message.id == welcome_message_id:
             role_name = next((k for k, role in role_emojis.items() if role == reaction.emoji), None)
-            role = interaction.guild.get_role(int(role_name))
+            role = user.guild.get_role(int(role_name))
             try:
                 await user.add_roles(role)
             except discord.Forbidden:
-                await interaction.response.send_message(f"I do not have permission to add <@&{role.id}>")
+                await reaction.channel.send_message(f"I do not have permission to add <@&{role.id}>")
                 return
             connection = sqlite3.connect("nea.sqlite")
             cursor = connection.cursor()
@@ -357,13 +366,13 @@ def role_commands(): #add to objectives
 
     @client.event()
     async def on_reaction_remove(reaction: discord.Reaction, user: discord.User):
-        if reaction.message.id == specific_message_id:
+        if reaction.message.id == welcome_message_id:
             role_name = next((k for k, role in role_emojis.items() if role == reaction.emoji), None)
-            role = interaction.guild.get_role(int(role_name))
+            role = user.guild.get_role(int(role_name))
             try:
                 await user.remove_roles(role)
             except discord.Forbidden:
-                await interaction.response.send_message(f"I do not have permission to add <@&{role.id}>")
+                await reaction.channel.send_message(f"I do not have permission to remove <@&{role.id}>")
                 return
             connection = sqlite3.connect("nea.sqlite")
             cursor = connection.cursor()

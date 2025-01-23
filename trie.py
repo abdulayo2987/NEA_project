@@ -13,9 +13,9 @@ class trie:
         current_node = self.root
         
         for character in word:
-            if character not in current_node.children:              #if the character is not in the children nodes
-                current_node.children[character] = trie_node()  #add the character as a key and set make it point to a new node
-            current_node = current_node.children[character]     #set this node as the current node regardless of if it is a new character or not 
+            if character not in current_node.children:        
+                current_node.children[character] = trie_node() 
+            current_node = current_node.children[character]
         current_node.is_end_of_word = True
 
 

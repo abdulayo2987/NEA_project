@@ -30,11 +30,12 @@ async def on_message(message: Message) -> None:
     guild = message.guild
     file_path = f'{guild}.txt'
     try:
-        with open(filepath, "r") as file:
+        with open(file_path, "r") as file:
             first_message = file.readline().strip()
-        if first_messasge == "first message has been sent":
+        if first_message == "first message has been sent":
             return
     except FileNotFoundError:
+        #make new caregory called important and add thes channels to it
         await new_roles_channel(guild)
         await new_welcome_channel(guild)
         with open(file_path, 'w') as file:
