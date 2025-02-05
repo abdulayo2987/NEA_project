@@ -92,22 +92,11 @@ def fill_user_roles():
     cursor = connection.cursor()
     members = list(client.get_all_members())
     for member in members:
-        cursor.execute("SELECT COUNT(*) FROM user_roles "
-                       "WHERE user_id = ? AND top_role_id = ? AND guild_id = ? ", (member.id, member.top_role.id, member.guild.id))
-        exists = cursor.fetchone()[0]
-        if not exists:
-            if member.top_role:
-                cursor.execute("""
-                Insert into user_roles (user_id, top_role_id, guild_id)
+        if member.top_role:
+            cursor.execute("""
+                INSERT OR REPLACE INTO user_roles (user_id, top_role_id, guild_id)
                 VALUES (?, ?, ?)
-                """, (member.id, member.top_role.id, member.guild.id))
-        else:
-            if member.top_role:
-                cursor.execute("""
-                UPDATE user_roles
-                SET top_role_id = ?, guild_id = ?
-                WHERE user_id = ?
-                """, (member.top_role.id, member.guild.id, member.id))
+            """, (member.id, member.top_role.id, member.guild.id))
     connection.commit()
     connection.close()
 

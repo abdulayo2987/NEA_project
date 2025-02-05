@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="NEA.sqlite" uuid="95b3b1d0-8e69-4653-bb64-91c717bf46c6">
+    <data-source source="LOCAL" name="nea.sqlite" uuid="502291f1-595d-49b3-a517-f48c5f1cbfd6">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
-      <remarks>nea</remarks>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:NEA.sqlite</jdbc-url>
+      <jdbc-url>jdbc:sqlite:nea.sqlite</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

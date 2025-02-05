@@ -1,10 +1,10 @@
+import random
+import requests
+import discord
 from functions import new_channel
 from moderation import *
-import random
 from PIL import Image, ImageDraw, ImageFont
-import requests
 from io import BytesIO
-import discord
 
 responses = ["Welcome to our server {guild} {username}! Thanks for joining us!",
              "Hey there! Glad to have you here at our server {guild} {username}, thank you for joining!",

@@ -1,9 +1,9 @@
-# Imports
 import os
 from dotenv import load_dotenv
 from datbase import *
 from welcome import *
 from roles import *
+from posts import *
 #fix no module named 'audioop' by deleting import from python file
 
 # Load environment variables
@@ -11,8 +11,8 @@ load_dotenv()
 TOKEN = str(os.getenv('DISCORD_TOKEN'))
 
 moderation_commands()
+posts_commands()
 role_commands()
-check_message()
 new_member_join()
 
 @client.event
@@ -38,12 +38,15 @@ async def on_message(message: Message) -> None:
         #make new caregory called important and add thes channels to it
         await new_roles_channel(guild)
         await new_welcome_channel(guild)
+        await new_posts_channel(guild)
         with open(file_path, 'w') as file:
+            file.write("first message has been sent \n")
             file.write("welcome and role channel created \n")
         fill_database(guild)
-        with open(file_path, 'w') as file:
+        with open(file_path, 'a') as file:
             file.write("database filled\n")
 
+#TODO fix mod stats again
 
 # Main function
 def main():

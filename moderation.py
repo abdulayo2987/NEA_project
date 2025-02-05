@@ -7,7 +7,7 @@ from typing import Literal
 
 intents = Intents.default()
 intents.message_content = True
-intents.reactoion = False
+intents.reactions = False
 intents.members = True
 client = Client(intents=intents)
 bot = app_commands.CommandTree(client)
@@ -52,6 +52,7 @@ def moderation_commands():
             await interaction.response.send_message(f'"{check_word}" is banned.')
         else:
             await interaction.response.send_message(f'"{check_word}" is not banned.')
+    check_message()
 
 def check_message():
     @client.event
@@ -62,8 +63,7 @@ def check_message():
             if bad_word:
                 await moderator_action(message, banned_words_punishments[word], word)
                 await message.delete()
-                await message.channel.send(f"{client.user.mention} has {banned_words_punishments[word]}ed {message.author.mention}reason: message contained word that is banned")
-
+                await message.channel.send(f"{client.user.mention} has {banned_words_punishments[word]}ed {message.author.mention} reason: message contained word that is banned")
                 break
 
 async def moderator_action(message: Message, punishment: str, bad_word: str):

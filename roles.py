@@ -24,14 +24,14 @@ async def role_autocomplete(interaction: discord.Interaction, current: str):
     ]
 
 async def user_role_autocomplete(current: str, user: discord.Member):
-    roles = user.roles  # Get roles of the provided user
+    roles = user.roles
     return [
         app_commands.Choice(name=role.name, value=str(role.id))
         for role in roles
         if current.lower() in role.name.lower()
     ]
 
-def role_commands(): #add to objectives
+def role_commands():
 
     @bot.command(name="new_role", description="Add a new role into the server")
     @app_commands.describe(role_name="What is the name of the role you want to add",
@@ -343,7 +343,7 @@ def role_commands(): #add to objectives
                         await interaction.response.send_message("one or more of the emojis you have added is not an emoji")
                     return
 
-    @client.event()
+    @client.event
     async def on_reaction_add(reaction: discord.Reaction, user: discord.User):
         if reaction.message.id == welcome_message_id:
             role_name = next((k for k, role in role_emojis.items() if role == reaction.emoji), None)
@@ -364,7 +364,7 @@ def role_commands(): #add to objectives
             connection.close()
 
 
-    @client.event()
+    @client.event
     async def on_reaction_remove(reaction: discord.Reaction, user: discord.User):
         if reaction.message.id == welcome_message_id:
             role_name = next((k for k, role in role_emojis.items() if role == reaction.emoji), None)
