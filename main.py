@@ -1,17 +1,17 @@
-import os
-from dotenv import load_dotenv
 from datbase import *
-from welcome import *
-from roles import *
+from levels import *
 from posts import *
+from roles import *
+from welcome import *
+
 #fix no module named 'audioop' by deleting import from python file
 
-# Load environment variables
 load_dotenv()
 TOKEN = str(os.getenv('DISCORD_TOKEN'))
 
 moderation_commands()
 posts_commands()
+leveling_commands()
 role_commands()
 new_member_join()
 
@@ -24,9 +24,10 @@ async def on_ready():
         print(f"Failed to sync commands: {e}")
 
 @client.event
-async def on_message(message: Message) -> None:
+async def on_message(message: Message):
     if message.author == client.user:
         return
+    await message_xp(message)
     guild = message.guild
     file_path = f'{guild}.txt'
     try:
@@ -35,7 +36,6 @@ async def on_message(message: Message) -> None:
         if first_message == "first message has been sent":
             return
     except FileNotFoundError:
-        #make new caregory called important and add thes channels to it
         await new_roles_channel(guild)
         await new_welcome_channel(guild)
         await new_posts_channel(guild)
@@ -45,8 +45,6 @@ async def on_message(message: Message) -> None:
         fill_database(guild)
         with open(file_path, 'a') as file:
             file.write("database filled\n")
-
-#TODO fix mod stats again
 
 # Main function
 def main():

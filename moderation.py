@@ -1,14 +1,16 @@
-from datetime import timedelta
-import discord
 import sqlite3
-from discord import app_commands, Client, Intents, Message
-from trie import trie
+import discord
+from datetime import timedelta
 from typing import Literal
+from trie import trie
+from discord import app_commands, Client, Intents, Message
+
 
 intents = Intents.default()
 intents.message_content = True
 intents.reactions = False
 intents.members = True
+intents.guilds = True
 client = Client(intents=intents)
 bot = app_commands.CommandTree(client)
 
@@ -26,8 +28,15 @@ banned_words_punishments = {
 
 def moderation_commands():
 
+    @bot.command(name="sync", description="sync commands")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def sync(interaction: discord.Interaction):
+        await bot.sync()
+        await interaction.response.send_message("Commands synced!")
+
     @bot.command(name="ban_word", description="Ban a word from being used in the server.")
     @app_commands.describe(banned_word_add="What word do you want to ban?", punishment="What punishment do you want to give for using this word?")
+    @app_commands.checks.has_permissions(manage_guild=True)
     async def ban_word(interaction: discord.Interaction, banned_word_add: str, punishment: Literal["warn", "mute", "kick", "ban"]):
         banned_words.insert(banned_word_add)
         banned_words_punishments[banned_word_add] = punishment
@@ -35,6 +44,7 @@ def moderation_commands():
 
     @bot.command(name="unban_word", description="Unban a word from being used in the server.")
     @app_commands.describe(unbanned_word="What word do you want to unban?")
+    @app_commands.checks.has_permissions(manage_guild=True)
     async def unban_word(interaction: discord.Interaction, unbanned_word: str):
         banned_words.delete(unbanned_word)
         if unbanned_word in banned_words_punishments:

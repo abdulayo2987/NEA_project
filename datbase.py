@@ -12,15 +12,15 @@ def fill_users():
         exists = cursor.fetchone()[0]
         if not exists:
             cursor.execute("""
-                INSERT INTO users (user_id, username, join_date, level)
-                VALUES (?, ?, ?, ?)
-            """, (member.id, member.global_name, member.joined_at.date(), 0))
+                INSERT INTO users (user_id, username, join_date)
+                VALUES (?, ?, ?)
+            """, (member.id, member.global_name, member.joined_at.date()))
         else:
             cursor.execute("""
                 UPDATE users
-                SET username = ?, join_date = ?, level = ?
+                SET username = ?, join_date = ?
                 WHERE user_id = ?
-            """, (member.global_name, member.joined_at.date(), 0, member.id))
+            """, (member.global_name, member.joined_at.date(), member.id))
     connection.commit()
     connection.close()
 
@@ -29,20 +29,66 @@ def fill_moderation_stats():
     cursor = connection.cursor()
     members = list(client.get_all_members())
     for member in members:
-        cursor.execute("SELECT COUNT(*) FROM users WHERE user_id = ?", (member.id,))
+        cursor.execute("SELECT COUNT(*) FROM moderation_stats WHERE user_id = ? AND guild_id = ?", (member.id, member.guild.id))
         exists = cursor.fetchone()[0]
         if not exists:
             cursor.execute("""
-                    INSERT INTO moderation_stats (user_id, guild_id, top_role_id) 
-                    VALUES (?, ?, ?)
-                    """, (member.id, member.top_role.id, member.guild.id))
+                        INSERT INTO moderation_stats (user_id, guild_id, top_role_id, warn_count, mute_count, kick_count, ban_count) 
+                        VALUES (?, ?, ?, 0, 0, 0, 0)
+                        """, (member.id, member.guild.id, member.top_role.id))
 
         else:
             cursor.execute("""
-            UPDATE moderation_stats
-            SET top_role_id = ?, guild_id = ?
-            WHERE user_id = ?
-            """, (member.top_role.id, member.guild.id, member.id))
+                UPDATE moderation_stats
+                SET top_role_id = ?
+                WHERE guild_id = ? AND user_id = ?
+                """, (member.top_role.id, member.guild.id, member.id))
+    connection.commit()
+    connection.close()
+
+def fill_levels():
+    connection = sqlite3.connect(file)
+    cursor = connection.cursor()
+    members = list(client.get_all_members())
+    for member in members:
+        cursor.execute("SELECT COUNT(*) FROM levels WHERE user_id = ? AND guild_id = ?",
+                       (member.id, member.guild.id))
+        exists = cursor.fetchone()[0]
+        if not exists:
+            cursor.execute("""
+                            INSERT INTO levels (user_id, guild_id, level, xp) 
+                            VALUES (?, ?, 1, 0)
+                            """, (member.id, member.guild.id))
+
+        else:
+            cursor.execute("""
+                    UPDATE levels
+                    SET level = 1, xp = 0
+                    WHERE guild_id = ? AND user_id = ?
+                    """, (member.guild.id, member.id))
+    connection.commit()
+    connection.close()
+
+def fill_xp():
+    connection = sqlite3.connect(file)
+    cursor = connection.cursor()
+    members = list(client.get_all_members())
+    for member in members:
+        cursor.execute("SELECT COUNT(*) FROM xp_tracking WHERE user_id = ? AND guild_id = ?",
+                       (member.id, member.guild.id))
+        exists = cursor.fetchone()[0]
+        if not exists:
+            cursor.execute("""
+                                INSERT INTO xp_tracking (user_id, guild_id, xp_earned, last_reset) 
+                                VALUES (?, ?, 0, current_timestamp)
+                                """, (member.id, member.guild.id))
+
+        else:
+            cursor.execute("""
+                        UPDATE xp_tracking
+                        SET xp_earned = 0, last_reset = current_timestamp
+                        WHERE guild_id = ? AND user_id = ?
+                        """, (member.guild.id, member.id))
     connection.commit()
     connection.close()
 
@@ -55,14 +101,12 @@ def fill_guilds(guild):
         cursor.execute("""
         INSERT INTO guilds (guild_id, guild_name, owner_id, creation_date) VALUES (?, ?, ?, ?)
         """, (guild.id, guild.name, guild.owner.global_name, guild.created_at.date()))
-        print("code ran")
     else:
         cursor.execute("""
         UPDATE guilds
         SET guild_name = ?, owner_id = ?, creation_date = ?
         WHERE guild_id = ?
         """, (guild.name, guild.owner.id, guild.created_at.date(), guild.id))
-        print("code ran")
     connection.commit()
     connection.close()
 
@@ -103,6 +147,8 @@ def fill_user_roles():
 def fill_database(guild):
     fill_users()
     fill_moderation_stats()
+    fill_levels()
+    fill_xp()
     fill_guilds(guild)
     fill_roles(guild)
     fill_user_roles()

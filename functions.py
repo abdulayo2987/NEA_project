@@ -10,3 +10,4 @@ async def new_channel(guild, name):
         await channel.delete(reason="cuz i said so")
         channel = await guild.create_text_channel(name)
         return channel
+

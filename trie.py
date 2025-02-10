@@ -1,4 +1,4 @@
-#TODO write about this data structure inside the NEA document design and analysis
+
 
 class trie_node:
     def __init__(self):

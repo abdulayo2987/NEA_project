@@ -1,6 +1,3 @@
-import discord
-
-
 from functions import new_channel
 from moderation import *
 
@@ -37,6 +34,7 @@ def role_commands():
     @app_commands.describe(role_name="What is the name of the role you want to add",
                            emoji="What is the emoji of the role you want to add(windows key + '.')",
                            colour="What colour do you want this role to be")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def new_role(interaction: discord.Interaction, role_name: str, emoji: str, colour: str):
         try:
             colour = getattr(discord.Color, colour.lower())()
@@ -69,6 +67,7 @@ def role_commands():
 
     @bot.command(name="delete_role", description="Remove a role from the server")
     @app_commands.describe(role="What is the name of the role you want to remove",)
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def delete_role(interaction: discord.Interaction, role: str):
         role = interaction.guild.get_role(int(role))
         connection = sqlite3.connect("nea.sqlite")
@@ -93,6 +92,7 @@ def role_commands():
 
     @bot.command(name="add_role_to_member", description="Add a role to a member in the server")
     @app_commands.describe(user="Who do you want me to add the role to", role="What is the name of the role you want to add")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def add_role_to_member(interaction: discord.Interaction, user: discord.Member, role: str):
         role = interaction.guild.get_role(int(role))
         try:
@@ -117,6 +117,7 @@ def role_commands():
     @bot.command(name="remove_role_from_member", description="remove a role from a member in the server")
     @app_commands.describe(user="Who do you want me to remove the role from",
                            role="What is the name of the role you want to remove")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def remove_role_from_member(interaction: discord.Interaction, user: discord.Member, role: str):
         role = interaction.guild.get_role(int(role))
         try:
@@ -141,6 +142,7 @@ def role_commands():
 
     @bot.command(name="change_role_emoji", description="Change the emoji of a role in the server")
     @app_commands.describe(role="What is the name of the role you want to change", emoji="What emoji do you want this emoji to have")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def change_role_emoji(interaction: discord.Interaction, role: str, emoji: str):
         role = interaction.guild.get_role(int(role))
         role_emojis[role.name] = emoji
@@ -152,6 +154,7 @@ def role_commands():
     @bot.command(name="change_role_color", description="Change the color of the role in the server")
     @app_commands.describe(role="What is the name of the role you want to change",
                            colour="What colour do you want this role to be")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def change_role_color(interaction: discord.Interaction, role: str, colour: str):
         try:
             color = getattr(discord.Color, colour.lower())()
@@ -167,6 +170,7 @@ def role_commands():
 
     @bot.command(name="add_role_to_all_members", description="Add a role to a all members in the server")
     @app_commands.describe(role="What is the name of the role you want to add to everyone")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def add_role_to_all_members(interaction: discord.Interaction, role: str):
         role = interaction.guild.get_role(int(role))
         connection = sqlite3.connect("nea.sqlite")
@@ -191,6 +195,7 @@ def role_commands():
 
     @bot.command(name="remove_role_from_all_members", description="Remove a role in a all members in the server")
     @app_commands.describe(role="What is the name of the role you want to remove")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def remove_role_from_all_members(interaction: discord.Interaction, role: str):
         role = interaction.guild.get_role(int(role))
         connection = sqlite3.connect("nea.sqlite")
@@ -215,6 +220,7 @@ def role_commands():
 
     @bot.command(name="add_role_to_existing_role", description="give everyone with a specific role another role")
     @app_commands.describe(existing_role="what role do you want to add to",role_to_add="What is the name of the role you want to add to everyone")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def add_role_to_existing_role(interaction: discord.Interaction, existing_role: str, role_to_add: str):
         existing_role = interaction.guild.get_role(int(existing_role))
         role_to_add = interaction.guild.get_role(int(role_to_add))
@@ -247,6 +253,7 @@ def role_commands():
 
     @bot.command(name="remove_all_roles", description="Remove all roles from a member")
     @app_commands.describe(user="who do you want to remove roles from")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def remove_all_roles(interaction: discord.Interaction, user: discord.Member):
         roles = user.roles
         for role in roles:
@@ -269,6 +276,7 @@ def role_commands():
 
     @bot.command(name="add_role_to_all_humans", description="Add a role to a all humans in the server")
     @app_commands.describe(role="What is the name of the role you want to add to everyone")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def add_role_to_all_humans(interaction: discord.Interaction, role: str):
         role = interaction.guild.get_role(int(role))
         connection = sqlite3.connect("nea.sqlite")
@@ -296,6 +304,7 @@ def role_commands():
 
     @bot.command(name="remove_role_from_all_humans", description="Remove a role in a all humans in the server")
     @app_commands.describe(role="What is the name of the role you want to remove")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def remove_role_from_all_humans(interaction: discord.Interaction, role: str):
         role = interaction.guild.get_role(int(role))
         connection = sqlite3.connect("nea.sqlite")
@@ -322,6 +331,7 @@ def role_commands():
         return await role_autocomplete(interaction, current)
 
     @bot.command(name="welcome_message", description="sends a welcome message that users can react to to get a role")
+    @app_commands.checks.has_permissions(manage_roles=True)
     async def welcome_message(interaction: discord.Interaction):
         channel = discord.utils.get(interaction.guild.channels, name="posts")
         if interaction.channel.id != channel.id:

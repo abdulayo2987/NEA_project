@@ -73,3 +73,23 @@ async def on_message(message: Message) -> None:
     async def delete_role(interaction: discord.Interaction, role_name: Literal[list[client.get_guild().roles]]):
         role_name = role_name[0]
         await interaction.response.send_message("function working")
+
+    connection = sqlite3.connect(file)
+    cursor = connection.cursor()
+    cursor.execute("""
+            SELECT xp
+            FROM levels
+            WHERE user_id = ? AND guild_id = ?
+            """, (member.id, interaction.guild.id))
+    xp = int(cursor.fetchone()[0])
+    xp = xp + xp_add
+    for i in range(100):
+        level = 5 / 6 * i * (2 * i ^ 2 + 27 * i + 91)
+        if xp >= level:
+            level = i
+            break
+    cursor.execute("""
+            INSERT INTO levels(user_id, guild_id, xp, level)
+            VALUES(?, ?, ?, ?)
+            """, (member.id, interaction.guild.id, xp, level))
+    connection.close()

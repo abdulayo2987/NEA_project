@@ -1,10 +1,9 @@
 import random
+from io import BytesIO
 import requests
-import discord
+from PIL import Image, ImageDraw, ImageFont
 from functions import new_channel
 from moderation import *
-from PIL import Image, ImageDraw, ImageFont
-from io import BytesIO
 
 responses = ["Welcome to our server {guild} {username}! Thanks for joining us!",
              "Hey there! Glad to have you here at our server {guild} {username}, thank you for joining!",
@@ -32,6 +31,7 @@ async def new_welcome_channel(guild):
 def new_member_join():
     @client.event
     async def on_member_join(member: discord.Member):
+        await add_to_database(member)
         await welcome_message(member)
         await welcome_image(member)
 
@@ -103,3 +103,28 @@ async def welcome_image(member):
     output_path = "welcome.png"
     background.save(output_path)
     await channel.send(file=discord.File(output_path))
+
+async def add_to_database(member):
+    file = "nea.sqlite"
+    connection = sqlite3.connect(file)
+    cursor = connection.cursor()
+    cursor.execute("""
+    INSERT INTO users (user_id, username, join_date)
+    VALUES (?, ?, ?)
+    """, (member.id, member.name, member.joined_at))
+    cursor.execute("""
+    INSERT INTO moderation_stats (user_id, guild_id, top_role_id) 
+    VALUES (?, ?, ?)
+    """,(member.id, member.guild.id, member.top_role.id))
+    cursor.execute("""
+    INSERT INTO user_roles ( user_id, guild_id, top_role_id) 
+    VALUES (?, ?, ?)
+    """, (member.id, member.guild.id, member.top_role.id))
+    cursor.execute("""
+    INSERT INTO levels (user_id, guild_id, level, xp)
+    Values (?, ?, 1, 0)
+    """, (member.id, member.guild.id))
+    cursor.execute("""
+    INSERT INTO xp_tracking (user_id, guild_id, xp_earned, last_reset) 
+    VALUES (?, ?, 0, ?)
+    """,(member.id, member.guild.id, datetime.utcnow()))
