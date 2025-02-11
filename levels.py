@@ -55,7 +55,10 @@ async def message_xp(message: Message):
     """, (message.author.id, message.guild.id))
     result = cursor.fetchone()
     current_time = datetime.utcnow()
-    xp_earned, last_reset = result
+    if result is None:
+        xp_earned, last_reset = 0, current_time  # Default values
+    else:
+        xp_earned, last_reset = result
     last_reset = datetime.strptime(last_reset, "%Y-%m-%d %H:%M:%S.%f")
     if current_time - last_reset >= timedelta(hours=1):
         cursor.execute("""
