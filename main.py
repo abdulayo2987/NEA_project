@@ -4,10 +4,9 @@ from posts import *
 from roles import *
 from welcome import *
 
-#fix no module named 'audioop' by deleting import from python file
-
 load_dotenv()
 TOKEN = str(os.getenv('DISCORD_TOKEN'))
+
 
 moderation_commands()
 posts_commands()
@@ -19,6 +18,7 @@ new_member_join()
 async def on_ready():
     try:
         synced = await bot.sync()
+        await music_setup()
         print(f'Commands synced successfully: {len(synced)} command(s)')
     except discord.Forbidden as e:
         print(f"Failed to sync commands: {e}")

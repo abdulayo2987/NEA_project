@@ -9,6 +9,7 @@ from discord import app_commands, Client, Intents, Message
 intents = Intents.default()
 intents.message_content = True
 intents.reactions = False
+intents.voice_states = True
 intents.members = True
 intents.guilds = True
 client = Client(intents=intents)
