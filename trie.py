@@ -1,5 +1,3 @@
-
-
 class trie_node:
     def __init__(self):
         self.children = dict()
